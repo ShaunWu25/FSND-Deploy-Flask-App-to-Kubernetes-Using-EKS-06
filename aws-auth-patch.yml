@@ -6,6 +6,10 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
+    - rolearn: arn:aws:iam::744594555714:role/UdacityFlaskDeployCBKubectlRole
+    username: build
+    groups:
+      - system:masters
   mapUsers: |
     []
 kind: ConfigMap
@@ -19,3 +23,5 @@ metadata:
   resourceVersion: "2541"
   selfLink: /api/v1/namespaces/kube-system/configmaps/aws-auth
   uid: 63909b37-9eba-4c9e-98e1-56c76b9d20c9
+
+$ kubectl apply -f aws-auth.yaml
