@@ -1,0 +1,85 @@
+export TOKEN=`curl -d '{"email":"shaunwu25@gmail.com","password":"123456789"}' -H "Content-Type: application/json" -X POST localhost:8080/auth  | jq -r '.token'`
+
+export TOKEN=`curl -d '{"email":"shaunwu25@gmail.com","password":"123456789"}' -H "Content-Type: application/json" -X POST localhost:80/auth  | jq -r '.token'`
+
+curl --request GET 'http://127.0.0.1:8080/contents' -H "Authorization: Bearer ${TOKEN}" | jq .
+
+
+
+
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+
+TRUST="{ \"Version\": \"2012-10-17\", \"Statement\": [ { \"Effect\": \"Allow\",  \"Principal\": { \"AWS\": \"arn:aws:iam::${ACCOUNT_ID}:root\" }, \"Action\":  \"sts:AssumeRole\" } ] }"
+
+aws iam create-role --role-name UdacityFlaskDeployCBKubectlRole20 --assume-role-policy-document "$TRUST" --output text --query 'Role.Arn'
+
+echo '{ "Version": "2012-10-17", "Statement": [ { "Effect": "Allow", "Action": [ "eks:Describe*", "ssm:GetParameters" ], "Resource": "*" } ] }' > ./iam-role-policy 
+
+aws iam put-role-policy --role-name UdacityFlaskDeployCBKubectlRole --policy-name eks-describe --policy-document file://./iam-role-policy
+
+kubectl get -n kube-system configmap/aws-auth -o yaml > ./aws-auth-patch.yml
+
+
+
+kubectl patch configmap/aws-auth -n kube-system --patch "$(cat ./aws-auth-patch.yml)"
+
+
+arn:aws:eks:ap-southeast-1:744594555714:cluster/simple-jwt-api
+arn:aws:iam::744594555714:role/eksctl-simple-jwt-api-nodegroup-n-NodeInstanceRole-1BDHL2TUM5MI3
+
+aws eks describe-cluster --name simple-jwt-api
+
+arn:aws:iam::744594555714:role/UdacityFlaskDeployCBKubectlRole20
+
+
+
+
+
+
+TRUST = "{   \"Version\": \"2012-10-17\",   \"Statement\": [     {       \"Effect\": \"Allow\",       \"Principal\": {         \"Service\": \"codebuild.amazonaws.com\"       },       \"Action\": \"sts:AssumeRole\"     }   ] }"
+
+echo '{ "Version": "2012-10-17", "Statement": [ { "Effect": "Allow", "Action": "eks:Describe*", "Resource": "*" } ] }' > ./iam-role-policy
+
+aws iam create-role --role-name CodeBuildKubectlRole --assume-role-policy-document "$TRUST" --output text --query 'Role.Arn'
+
+aws iam put-role-policy --role-name CodeBuildKubectlRole --policy-name eks-describe --policy-document file://./iam-role-policy
+
+aws iam attach-role-policy --role-name CodeBuildKubectlRole --policy-arn arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+
+aws iam attach-role-policy --role-name CodeBuildKubectlRole --policy-arn arn:aws:iam::aws:policy/AWSCodeBuildAdminAccess
+
+
+
+minikube start
+
+kubectl apply -f aws-auth-cm.yaml
+
+aws eks --region ap-southeast-1 update-kubeconfig --name simple-jwt-api
+
+
+kubectl exec -it simple-jwt-api-7d64c54b58-7v898 /bin/bash
+
+export TOKEN=`curl -d '{"email":"shaunwu25@gmail.com","password":"123456789"}' -H "Content-Type: application/json" -X POST a92f34628f40346919ffdc9212bf4f51-149990064.ap-southeast-1.elb.amazonaws.com/auth  | jq -r '.token'`
+curl --request GET 'a92f34628f40346919ffdc9212bf4f51-149990064.ap-southeast-1.elb.amazonaws.com/contents' -H "Authorization: Bearer ${TOKEN}" | jq 
+
+
+kubectl get services simple-jwt-api -o wide
+NAME             TYPE           CLUSTER-IP       EXTERNAL-IP                                                                   PORT(S)        AGE   SELECTOR
+simple-jwt-api   LoadBalancer   10.100.161.252   a92f34628f40346919ffdc9212bf4f51-149990064.ap-southeast-1.elb.amazonaws.com   80:32063/TCP   22m   app=simple-jwt-api
+
+
+export TOKEN=`curl -d '{"email":"shaunwu25@gmail.com","password":"123456789"}' -H "Content-Type: application/json" -X POST localhost:8080/auth  | jq -r '.token'`
+export TOKEN=`curl -d '{"email":"<EMAIL>","password":"<PASSWORD>"}' -H "Content-Type: application/json" -X POST localhost:8080/auth  | jq -r '.token'`
+
+curl --request GET 'http://127.0.0.1:8080/contents' -H "Authorization: Bearer ${TOKEN}" | jq .
+
+
+
+
+kubectl get services simple-jwt-api -o wide
+NAME             TYPE           CLUSTER-IP       EXTERNAL-IP                                                                   PORT(S)        AGE   SELECTOR
+simple-jwt-api   LoadBalancer   10.100.161.252   a92f34628f40346919ffdc9212bf4f51-149990064.ap-southeast-1.elb.amazonaws.com   80:32063/TCP   16h   app=simple-jwt-api
+
+
+export TOKEN=`curl -d '{"email":"test@gmail.com","password":"123456789"}' -H "Content-Type: application/json" -X POST a92f34628f40346919ffdc9212bf4f51-149990064.ap-southeast-1.elb.amazonaws.com/auth  | jq -r '.token'`
+curl --request GET 'a92f34628f40346919ffdc9212bf4f51-149990064.ap-southeast-1.elb.amazonaws.com/contents' -H "Authorization: Bearer ${TOKEN}" | jq 
