@@ -44,7 +44,6 @@ phases:
   build:
     commands:
       - docker build --tag $REPOSITORY_URI:$TAG .
-      - kubectl apply -f deployment
 
   post_build:
     commands:
