@@ -14,9 +14,6 @@ data:
     []
 kind: ConfigMap
 metadata:
-  annotations:
-    kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"v1","data":{"mapRoles":"- rolearn: arn:aws:iam::744594555714:role/eksctl-simple-jwt-api-nodegroup-n-NodeInstanceRole-N5WXX171XBWK\n  username: system:node:{{EC2PrivateDNSName}}\n  groups:\n    - system:bootstrappers\n    - system:nodes\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"aws-auth","namespace":"kube-system"}}
   creationTimestamp: "2020-06-16T14:47:08Z"
   name: aws-auth
   namespace: kube-system
@@ -24,4 +21,3 @@ metadata:
   selfLink: /api/v1/namespaces/kube-system/configmaps/aws-auth
   uid: 63909b37-9eba-4c9e-98e1-56c76b9d20c9
 
-$ kubectl apply -f aws-auth.yaml
